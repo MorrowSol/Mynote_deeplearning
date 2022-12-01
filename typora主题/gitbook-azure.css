@@ -33,7 +33,7 @@
     --heading-text-color: #242a31;
     --light-text-color: #bfc7cf;
     --light-text-color-darker: #74818d;
-    --codeboxes: #f1f1f1;
+    --codeboxes: #f0f0f0;
     --codeboxes-lighter: #1c375f;
     --rawblock-edit-panel-bd: transparent;
 
@@ -184,7 +184,7 @@ h2 {
     font-size: 1.7rem;
     font-weight: 700;
     line-height: 1.5;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
     margin-bottom: 0.5rem;
 }
 
@@ -192,7 +192,7 @@ h3 {
     font-size: 1.375rem;
     font-weight: 700;
     line-height: 1.5;
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     margin-bottom: 0.5rem;
 }
 
@@ -200,7 +200,7 @@ h4 {
     font-size: 1.15rem;
     font-weight: 700;
     line-height: 1.5;
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     margin-bottom: 0.5rem;
 }
 
@@ -499,7 +499,7 @@ table tr td:last-child {
 
 /*CODE*/
 
-.CodeMirror {
+/* .CodeMirror {
     padding: 0rem;
     font-family: var(--code-font-family);
 }
@@ -672,7 +672,7 @@ table tr td:last-child {
 .fences-auto-suggest li:hover {
     background-color: var(--boxes);
     color: var(--primary-color);
-}
+}*/
 
 .md-fences,
 tt {
@@ -691,10 +691,10 @@ code {
     -webkit-box-decoration-break: clone;
 }
 
-.md-fences div.CodeMirror-cursor,
+/* .md-fences div.CodeMirror-cursor,
 #typora-source div.CodeMirror-cursor {
     border-left: solid 1px white;
-}
+} */
 
 .md-fences {
     margin-bottom: 0.5rem;
@@ -704,11 +704,11 @@ code {
     background-color: var(--codeboxes);
 }
 
-#typora-source {
+/* #typora-source {
     background-color: var(--codeboxes);
     color: white;
     font-size: 0.9rem;
-}
+}  */
 
 /*DIAGRAMS*/
 
@@ -874,7 +874,7 @@ input[type="checkbox"]:checked:after {
 /*MATH*/
 
 .md-rawblock-container {
-    padding: 1rem;
+    padding: 0rem;
     border-radius: 0.3rem;
     cursor: pointer;
     transition-duration: 0.2s;

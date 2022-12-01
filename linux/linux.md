@@ -1,3 +1,172 @@
+# linux系统安装
+
+## 基础环境安装
+
+按照安装顺序进入桌面
+
+安装更新 弹窗（系统提示，可不更新）
+
+## 显卡驱动及cuda安装
+
+### 安装显卡驱动
+
+1. 可通过 软件和更新-附加驱动 选择驱动 自动安装（建议）
+
+2. 自行安装：
+
+   查看可安装驱动版本:
+
+   ```
+   ubuntu-drivers devices
+   ```
+
+   选择某版本安装：
+
+   ```
+   sudo apt install nvidia-driver-*
+   ```
+
+3. 上面两种方式都需要网络环境，还可以选择用安装包安装
+
+   此方法比较麻烦，可去网络自行查看，不做介绍
+
+安装完成后检查
+
+```
+nvidia-smi
+```
+
+可能出现
+
+```
+NVIDIA -SMI has failed because it couldn 't communicate with the NVIDIA  driver. Make sure th at the l ate st NVIDIA driver is installed and  running
+```
+
+解决方法
+
+```
+sudo apt-get install dkms
+利用命令
+ls /usr/src 
+可查看下面有一个nvidia-450.102.04/ 文件夹
+sudo dkms install -m nvidia -v 450.102.04 #后边的版本号是nvidia-后边的
+```
+
+### 安装cuda11.3   
+
+可去官网下载对应的包 地址：https://developer.nvidia.com/cuda-toolkit-archive
+
+建议使用runfile文件安装 一开始没反应是在加载 等一会
+
+```
+sudo sh cuda_11.3.1_465.19.01_linux.run  
+```
+
+安装时注意不要安装驱动，因为已经安装更新的了
+
+安装完检查 nvcc -V
+
+这时你会发现没有找到，不要安装，是因为环境变量没有配置
+
+打开自己user的.bashrc文件 可以用nano，或者vi，vim（可能没下）
+
+```
+nano ~/.bashrc
+```
+
+添加环境变量
+
+```
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+```
+
+ctrl+o写入    ctrl+x离开
+
+重新打开终端 更新环境变量
+
+再次检查 发现已经找到cuda
+
+```
+nvcc -V 
+```
+
+### 安装cudnn 
+
+地址：https://developer.nvidia.com/rdp/cudnn-archive
+
+根据cuda版本选择 建议选择tar包下载  
+
+```
+# 解压 
+tar -xvf  cudnn-linux-x86_64-8.4.0.27_cuda11.6-archive.tar.xz
+# 复制文件
+sudo cp cudnn-*-archive/include/cudnn*.h /usr/local/cuda/include 
+sudo cp -P cudnn-*-archive/lib/libcudnn* /usr/local/cuda/lib64 
+# 添加权限
+sudo chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
+```
+
+## 开启ssh和ftp
+
+### ssh
+
+```
+sudo apt-get install openssh-server
+sudo systemctl start ssh
+sudo systemctl enable ssh
+```
+
+### ftp
+
+```
+sudo apt-get install vsftpd
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+```
+
+### 固定ip地址
+
+在设置里选静态ip，输入ip，掩码，网关
+
+## 系统美化 
+
+### 安装 GNOME Tweaks 工具和 gnome 扩展
+
+GNOME Tweaks 工具是必须的，我们需要它来更改主题和图标，GNOME Tweaks 工具可以在Ubuntu的软件商店找到，也可以通过以下命令安装：
+
+```
+sudo apt-get install gnome-tweak-tool
+```
+
+为了更加的可自定义性，还需要去安装一下扩展：
+
+```
+sudo apt-get install gnome-shell-extensions
+```
+
+这里还要执行以下命令：浏览器插件 方便启用
+
+```
+sudo apt-get install chrome-gnome-shell 
+```
+
+### 进入GNOME官方插件中心安装插件
+
+https://extensions.gnome.org/  
+
+**User Themes** 主题 
+
+主题商店：https://www.gnome-look.org/browse/
+
+**Dash to Dock** 自定义dock
+
+**Fildem global menu** 全局菜单 
+
+还需安装一个程序见github页 https://github.com/gonzaarcr/Fildem
+
+新建文件 添加设置 开机启动
+
 # linux深度学习常用命令
 
 ## conda
@@ -270,7 +439,7 @@ sudo dpkg --list | grep nvidia-*
 sudo dpkg --get-selections | grep nvidia-*
 ```
 
-上面两个版本需一致 否则报 Failed to initialize NVML: Driver/library version mismatch 错误
+上面两个版本需一致 否则报 Failed to initialize NVML: Driver/library version mismatch 错误 只需reboot
 
 ### 查看当前使用cuda版本
 
@@ -392,6 +561,17 @@ cat /etc/group
 cat /etc/shadow
 cat /etc/passwd 
 ```
+### 添加权限
+
+```
+# 切换到root用户
+su
+# 编辑配置文件
+vim /etc/sudoers
+# 增加配置, 在打开的配置文件中，找到root ALL=(ALL) ALL, 在下面添加一行
+# 其中xxx是你要加入的用户名称
+xxx ALL=(ALL) ALL
+```
 
 ## 查看硬件信息
 
@@ -427,7 +607,7 @@ sudo fdisk -l
 sudo df -l
 ```
 
-## 改系统代理
+## 系统代理
 
 ```
 vim ~/.bashrc
@@ -438,6 +618,10 @@ export HTTPS_PROXY="https://127.0.0.1:7890"
 
 # 更新
 source ~/.bashrc
+
+# apt临时代理，直接改.bashrc只能作用改用户，加sudo后变为root无效
+# 或者切root后命令行临时加export HTTP_PROXY="http://172.18.144.56:7890"
+sudo apt -o Acquire::http::proxy="http://172.18.144.56:7890" install xxx
 ```
 
 ## 网络配置
@@ -502,6 +686,18 @@ netplan try
 # 应用配置(以便生效)，必要时重启管理工具
 netplan apply
 ```
+
+## 域名
+
+### 查看域名
+
+cat /etc/resolv.conf
+
+nameserver 127.0.0.1:53
+
+resolv.conf -> ../run/systemd/resolve/stub-resolv.conf
+
+
 
 ## 端口
 
@@ -806,6 +1002,72 @@ sudo firewall-cmd --remove-port=8001/tcp --permanent
 sudo firewall-cmd --reload
 ```
 
+## 交换区
+
+内存不够用时可适当增加交换区大小
+
+### 查看交换区大小
+
+```shell
+free -h
+```
+
+### 创建swap文件
+
+swap交换空间其实就是硬盘上一个特定的文件，只不过这个文件只有内存在读写，只不过这个文件比较大些。
+
+```
+# 随便找个地方 创建swapfile文件 路径和名字都随便
+# bs是没块的大小 count是数量 相乘是swap大小 
+sudo dd if=/dev/zero of=./swapfile bs=1G count=32
+```
+
+### 转换swap文件
+
+```
+sudo mkswap -f swapfile
+```
+
+### 激活swap文件
+
+```
+sudo swapon swap
+```
+
+### 卸载swap文件
+
+```
+sudo swapoff swap
+```
+
+### 开机挂载swap
+
+如果想要一直使用改后的swap还需开机挂载，打开fstab
+
+```
+sudo nano /etc/fstab
+# 找一行添加
+```
+
+![image-20221102113834821](linux.assets/image-20221102113834821.png)
+
+按照上面的格式提示来
+
+## 查看gpu占用
+
+```
+# *是具体的显卡号
+sudo fuser -v /dev/nvidia*
+```
+
+## linux监控
+
+top
+
+iotop
+
+s-tui
+
 # linux常用软件
 
 ## mysql
@@ -1040,3 +1302,76 @@ sudo nano /usr/local/nginx/conf/nginx.conf
 ```
 
 **文件详解：**https://www.cnblogs.com/54chensongxia/p/12938929.html
+
+## screen
+
+一个后台运行命令的软件
+
+特色功能：
+
+- 会话恢复：**只要Screen本身没有终止，在其内部运行的会话都可以恢复。**
+- 多窗口：在Screen环境下，**所有的会话都独立的运行，并拥有各自的编号、输入、输出和窗口缓存。**
+- 会话共享：Screen可以让一个或多个用户从不同终端多次登录一个会话，并共享会话的所有特性（比如可以看到完全相同的输出）
+
+### 安装
+
+```
+# CentOS 
+yum install screen 
+# Debian/Ubuntu 
+apt install screen
+```
+
+### 状态介绍
+
+通常情况下，screen创建的虚拟终端，有两个工作模式：
+
+- **Attached**：表示当前screen正在作为主终端使用，为活跃状态。
+- **Detached**：表示当前screen正在后台使用，为非激发状态。
+
+### 查看终端列表
+
+```
+screen -ls
+```
+
+### 新建终端
+
+```
+# 直接screen进入(以Linux的hostname命名）
+screen
+# 创建一个叫Hello的虚拟终端
+screen -S Hello
+# 使用-R创建Hello
+screen -R Hello
+```
+
+![image-20220826133110635](linux.assets/image-20220826133110635.png)
+
+![image-20220826133127952](linux.assets/image-20220826133127952.png)
+
+三种创建方法比较：
+
+- 使用`-R`创建，如果之前有创建唯一一个同名的screen，则直接进入之前创建的screen
+- 使用`-S`创建和直接输入`screen`创建的虚拟终端，不会检录之前创建的screen（**也就是会创建同名的screen**)
+
+### 回到主终端
+
+在虚拟终端时想回到主终端
+
+我们按`Ctrl+a`，再按`d`，即可**保持这个screen到后台**并回到主终端
+
+### 回到虚拟终端
+
+```
+# 使用screen -r/R命令
+screen -r [pid/name]
+```
+
+### 清除终端
+
+```
+# 需先进入要退出的虚拟终端
+exit
+```
+
